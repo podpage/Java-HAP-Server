@@ -28,6 +28,7 @@ public class Config implements HomekitAuthInfo {
     private String serialNumber;
 
     private String pin;
+    private short port;
 
     private String mac;
     private BigInteger salt;
@@ -43,6 +44,9 @@ public class Config implements HomekitAuthInfo {
         config.setPin((new SecureRandom().nextInt(100000000) + "").replaceFirst("(\\w{3})(\\w{2})(\\w{3})", "$1-$2-$3"));
         config.setSalt(HomekitServer.generateSalt());
         config.setMac(HomekitServer.generateMac());
+
+        config.setPort((short) 9123);
+
         try {
             config.setPrivateKey(HomekitServer.generateKey());
         } catch (Exception e) {
@@ -81,6 +85,9 @@ public class Config implements HomekitAuthInfo {
 
                 config.setPin(jsonobject.get("pin").getAsString());
                 config.setMac(jsonobject.get("mac").getAsString());
+
+                config.setPort(jsonobject.get("port").getAsShort());
+
                 config.setSalt(DatatypeConverter.parseInteger(jsonobject.get("salt").getAsString()));
                 config.setPrivateKey(DatatypeConverter.parseBase64Binary(jsonobject.get("privateKey").getAsString()));
 
@@ -191,6 +198,14 @@ public class Config implements HomekitAuthInfo {
         this.serialNumber = serialNumber;
     }
 
+    public short getPort() {
+        return port;
+    }
+
+    public void setPort(short port) {
+        this.port = port;
+    }
+
     public void saveConfig() {
         try {
             JsonObject innerObject = new JsonObject();
@@ -201,6 +216,7 @@ public class Config implements HomekitAuthInfo {
 
             innerObject.addProperty("pin", getPin());
             innerObject.addProperty("mac", getMac());
+            innerObject.addProperty("port", getPort());
             innerObject.addProperty("salt", DatatypeConverter.printInteger(getSalt()));
             innerObject.addProperty("privateKey", DatatypeConverter.printBase64Binary(getPrivateKey()));
             innerObject.addProperty("userKeyMap", new Gson().toJson(getUserKeyMap()));

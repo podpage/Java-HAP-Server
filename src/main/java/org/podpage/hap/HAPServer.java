@@ -16,10 +16,8 @@ public class HAPServer {
         config = Config.loadConfig();
         accessoryManager = new AccessoryManager(this);
 
-        int PORT = 9123;
-
         try {
-            homekit = new HomekitServer(PORT);
+            homekit = new HomekitServer(config.getPort());
             bridge = homekit.createBridge(config, config.getLabel(), config.getManufacturer(), config.getModel(), config.getSerialNumber());
             bridge.start();
 
