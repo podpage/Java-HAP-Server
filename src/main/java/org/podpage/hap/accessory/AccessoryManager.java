@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -57,8 +56,6 @@ public class AccessoryManager {
 
             URL[] urls = {new URL("jar:file:" + file.getPath() + "!/")};
             URLClassLoader cl = URLClassLoader.newInstance(urls);
-
-            HashMap<String, String> lang = new HashMap<>();
 
             while (e.hasMoreElements()) {
                 JarEntry je = e.nextElement();
