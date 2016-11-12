@@ -16,6 +16,8 @@ public class HAPServer {
         config = Config.loadConfig();
         accessoryManager = new AccessoryManager(this);
 
+        System.out.println("Your PIN: " + config.getPin());
+
         try {
             homekit = new HomekitServer(config.getPort());
             bridge = homekit.createBridge(config, config.getLabel(), config.getManufacturer(), config.getModel(), config.getSerialNumber());
