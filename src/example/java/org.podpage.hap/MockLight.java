@@ -1,8 +1,9 @@
-package org.podpage.hap;
+package org.podpage.hap.accessory;
 
 import com.beowulfe.hap.HomekitCharacteristicChangeCallback;
 import com.beowulfe.hap.accessories.Lightbulb;
 import org.podpage.hap.accessory.annotation.LoadableAccessory;
+import org.podpage.hap.accessory.annotation.PluginConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -54,7 +55,7 @@ public class MockLight implements Lightbulb {
         if (subscribeCallback != null) {
             subscribeCallback.changed();
         }
-        System.out.println("The Light is " + powerState ? "on" : "off");
+        System.out.println("The Light is " + (powerState ? "on" : "off"));
         return CompletableFuture.completedFuture(null);
     }
 

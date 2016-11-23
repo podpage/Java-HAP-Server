@@ -7,12 +7,14 @@ import org.podpage.hap.config.Config;
 
 public class HAPServer {
 
-    public AccessoryManager accessoryManager;
+    private static HAPServer hapServer;
+    private AccessoryManager accessoryManager;
     private Config config;
     private HomekitServer homekit;
     private HomekitRoot bridge;
 
-    public HAPServer() {
+    private HAPServer() {
+        hapServer = this;
         config = Config.loadConfig();
         accessoryManager = new AccessoryManager(this);
 
@@ -27,6 +29,17 @@ public class HAPServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static HAPServer getInstance() {
+        if (hapServer != null) {
+            return hapServer;
+        }
+        return new HAPServer();
+    }
+
+    public AccessoryManager getAccessoryManager() {
+        return accessoryManager;
     }
 
     public Config getConfig() {

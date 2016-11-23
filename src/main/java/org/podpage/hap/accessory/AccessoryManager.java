@@ -2,7 +2,6 @@ package org.podpage.hap.accessory;
 
 import com.beowulfe.hap.HomekitAccessory;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.podpage.hap.HAPServer;
 import org.podpage.hap.accessory.annotation.LoadableAccessory;
@@ -14,9 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -162,7 +159,7 @@ public class AccessoryManager {
                 }
             }
             json = json.substring(0, json.length() - 1) + "}";
-            if (fields.length == 0) {
+            if (fields.length == 0 || json.length() < 2) {
                 json = "{}";
             }
             try {
@@ -191,52 +188,22 @@ public class AccessoryManager {
             scan.close();
         } catch (Exception e) {
         }
-        JsonObject jobj = new Gson().fromJson(json, JsonObject.class);
-        Set<Map.Entry<String, JsonElement>> set = jobj.entrySet();
 
-        //Iterator<Entry<String, JsonElement>> i = set.iterator();
+        if (json.length() > 2) {
+            JsonObject config = new Gson().fromJson(json, JsonObject.class);
+            Field[] fields = homekitAccessory.getClass().getFields();
 
-        Field[] fields = homekitAccessory.getClass().getFields();
-
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(PluginConfig.class)) {
-                try {
-                    field.setAccessible(true);
-                    field.set(homekitAccessory, new Gson().fromJson(jobj.get(field.getName()).getAsJsonObject(), field.getType()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        /*while (i.hasNext()) {
-            Entry<String, JsonElement> ex = i.next();
-            try {
-                Field f = homekitAccessory.getClass().getField(ex.getKey());
-                if (f != null) {
-                    Class<?> typeclass = f.getType();
-                    if (typeclass.equals(String.class)) {
-                        f.set(homekitAccessory, ex.getValue().getAsString());
-                    } else if (typeclass.equals(Integer.class)
-                            || typeclass.equals(int.class)) {
-                        f.setInt(homekitAccessory, ex.getValue().getAsInt());
-                    } else if (typeclass.equals(Character.class)
-                            || typeclass.equals(char.class)) {
-                        f.setChar(homekitAccessory, ex.getValue().getAsCharacter());
-                    } else if (typeclass.equals(Boolean.class)
-                            || typeclass.equals(boolean.class)) {
-                        f.setBoolean(homekitAccessory, ex.getValue().getAsBoolean());
-                    } else if (typeclass.equals(Double.class)
-                            || typeclass.equals(double.class)) {
-                        f.setDouble(homekitAccessory, ex.getValue().getAsDouble());
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(PluginConfig.class)) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(homekitAccessory, new Gson().fromJson(config.get(field.getName()), field.getType()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-            } catch (IllegalArgumentException | IllegalAccessException
-                    | NoSuchFieldException | SecurityException e) {
-                e.printStackTrace();
             }
-        }*/
+        }
     }
 
 
