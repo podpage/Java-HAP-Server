@@ -181,12 +181,17 @@ public class AccessoryManager {
                     .getProtectionDomain().getCodeSource().getLocation()
                     .toURI().getPath()).getParentFile(), "config"), homekitAccessory.getManufacturer());
 
-            Scanner scan = new Scanner(new File(folder, homekitAccessory.getLabel() + ".json"));
-            while (scan.hasNext()) {
-                json += scan.next();
+            File config = new File(folder, homekitAccessory.getLabel() + ".json");
+
+            if (config.exists()) {
+                Scanner scan = new Scanner(config);
+                while (scan.hasNext()) {
+                    json += scan.next();
+                }
+                scan.close();
             }
-            scan.close();
         } catch (Exception e) {
+            json = "{}";
         }
 
         if (json.length() > 2) {
