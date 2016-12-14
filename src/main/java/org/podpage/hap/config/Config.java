@@ -28,6 +28,7 @@ public class Config implements HomekitAuthInfo {
     private String serialNumber;
 
     private String pin;
+    private String ip;
     private short port;
 
     private String mac;
@@ -45,6 +46,7 @@ public class Config implements HomekitAuthInfo {
         config.setSalt(HomekitServer.generateSalt());
         config.setMac(HomekitServer.generateMac());
 
+        config.setIP("127.0.0.1");
         config.setPort((short) 9123);
 
         try {
@@ -84,9 +86,10 @@ public class Config implements HomekitAuthInfo {
                 config.setModel(jsonobject.get("serialNumber").getAsString());
 
                 config.setPin(jsonobject.get("pin").getAsString());
-                config.setMac(jsonobject.get("mac").getAsString());
-
+                config.setIP(jsonobject.get("ip").getAsString());
                 config.setPort(jsonobject.get("port").getAsShort());
+
+                config.setMac(jsonobject.get("mac").getAsString());
 
                 config.setSalt(DatatypeConverter.parseInteger(jsonobject.get("salt").getAsString()));
                 config.setPrivateKey(DatatypeConverter.parseBase64Binary(jsonobject.get("privateKey").getAsString()));
@@ -150,18 +153,6 @@ public class Config implements HomekitAuthInfo {
     }
 
     @Override
-    public void createUser(String username, byte[] publicKey) {
-        userKeyMap.putIfAbsent(username, publicKey);
-        saveConfig();
-    }
-
-    @Override
-    public void removeUser(String username) {
-        userKeyMap.remove(username);
-        saveConfig();
-    }
-
-    @Override
     public byte[] getUserPublicKey(String username) {
         return userKeyMap.get(username);
     }
@@ -198,12 +189,32 @@ public class Config implements HomekitAuthInfo {
         this.serialNumber = serialNumber;
     }
 
+    public String getIP() {
+        return ip;
+    }
+
+    public void setIP(String ip) {
+        this.ip = ip;
+    }
+
     public short getPort() {
         return port;
     }
 
     public void setPort(short port) {
         this.port = port;
+    }
+
+    @Override
+    public void createUser(String username, byte[] publicKey) {
+        userKeyMap.putIfAbsent(username, publicKey);
+        saveConfig();
+    }
+
+    @Override
+    public void removeUser(String username) {
+        userKeyMap.remove(username);
+        saveConfig();
     }
 
     public void saveConfig() {
@@ -215,8 +226,10 @@ public class Config implements HomekitAuthInfo {
             innerObject.addProperty("serialNumber", getSerialNumber());
 
             innerObject.addProperty("pin", getPin());
-            innerObject.addProperty("mac", getMac());
+            innerObject.addProperty("ip", getIP());
             innerObject.addProperty("port", getPort());
+
+            innerObject.addProperty("mac", getMac());
             innerObject.addProperty("salt", DatatypeConverter.printInteger(getSalt()));
             innerObject.addProperty("privateKey", DatatypeConverter.printBase64Binary(getPrivateKey()));
             innerObject.addProperty("userKeyMap", new Gson().toJson(getUserKeyMap()));

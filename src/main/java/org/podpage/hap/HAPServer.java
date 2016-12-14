@@ -5,6 +5,8 @@ import com.beowulfe.hap.HomekitServer;
 import org.podpage.hap.accessory.AccessoryManager;
 import org.podpage.hap.config.Config;
 
+import java.net.InetAddress;
+
 public class HAPServer {
 
     public AccessoryManager accessoryManager;
@@ -19,7 +21,11 @@ public class HAPServer {
         System.out.println("Your PIN: " + config.getPin());
 
         try {
-            homekit = new HomekitServer(config.getPort());
+            if (config.getIP().equals("") || config.getIP().equals("127.0.0.1")) {
+                homekit = new HomekitServer(config.getPort());
+            } else {
+                homekit = new HomekitServer(InetAddress.getByName(config.getIP()), config.getPort());
+            }
             bridge = homekit.createBridge(config, config.getLabel(), config.getManufacturer(), config.getModel(), config.getSerialNumber());
             bridge.start();
 
